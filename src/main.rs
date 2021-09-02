@@ -6,8 +6,7 @@ use log::{info, error, LevelFilter};
 use html_to_email::cmd::HtmlToEmail;
 
 fn args() -> ArgMatches<'static> {
-    App::new("html_to_email")
-        .about("https://github.com/gonejack/html_to_email")
+    App::new("https://github.com/gonejack/html_to_email")
         .args(&[
             Arg::from_usage("-f, --from=[FROM] 'Set sender address'"),
             Arg::from_usage("-t, --to=[TO] 'Set receiver address'"),
