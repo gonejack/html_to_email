@@ -28,11 +28,11 @@ fn main() {
 
     let args = args();
 
-    let mut from = args.value_of("from").unwrap();
+    let mut from = args.value_of("from").unwrap_or_default();
     if from.is_empty() {
         from = "sender@example.com"
     }
-    let mut to = args.value_of("to").unwrap();
+    let mut to = args.value_of("to").unwrap_or_default();
     if to.is_empty() {
         to = "receiver@example.com"
     }
