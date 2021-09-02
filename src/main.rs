@@ -9,9 +9,9 @@ fn args() -> ArgMatches<'static> {
     App::new("html_to_email")
         .about("https://github.com/gonejack/html_to_email")
         .args(&[
-            Arg::from_usage("-f, --from=[FROM] 'set sender address'"),
-            Arg::from_usage("-t, --to=[TO] 'set receiver address'"),
-            Arg::from_usage("-v, --verbose 'verbose printing'"),
+            Arg::from_usage("-f, --from=[FROM] 'Set sender address'"),
+            Arg::from_usage("-t, --to=[TO] 'Set receiver address'"),
+            Arg::from_usage("-v, --verbose 'Verbose printing'"),
             Arg::with_name("html").multiple(true)
         ])
         .get_matches()

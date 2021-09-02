@@ -24,11 +24,11 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
-    -v, --verbose    verbose printing
+    -v, --verbose    Verbose printing
 
 OPTIONS:
-    -f, --from <FROM>    set sender address
-    -t, --to <TO>        set receiver address
+    -f, --from <FROM>    Set sender address
+    -t, --to <TO>        Set receiver address
 
 ARGS:
     <html>...   
