@@ -7,7 +7,7 @@ This command line converts .html file to .eml file.
 
 ### Install
 From crates.io
-```
+```shell
 > cargo install html_to_email
 ```
 Or the latest version
