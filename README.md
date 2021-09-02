@@ -2,12 +2,12 @@
 
 This command line converts .html file to .eml file.
 
-![Build](https://github.com/gonejack/html_to_email/actions/workflows/go.yml/badge.svg)
+![Build](https://github.com/gonejack/html_to_email/actions/workflows/rust.yml/badge.svg)
 [![GitHub license](https://img.shields.io/github/license/gonejack/html_to_email.svg?color=blue)](LICENSE)
 
 ### Install
 ```shell
-> go get github.com/gonejack/html_to_email
+> cargo install --git https://github.com/gonejack/html_to_email
 ```
 
 ### Usage
