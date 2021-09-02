@@ -1,19 +1,20 @@
+use std::env;
 use std::error::Error;
 
-use clap::{App, Arg, ArgMatches};
-use log::{info, error, LevelFilter};
+use getopts::{Options};
+use log::{error, info, LevelFilter};
 
 use html_to_email::cmd::HtmlToEmail;
 
-fn args() -> ArgMatches<'static> {
-    App::new("https://github.com/gonejack/html_to_email")
-        .args(&[
-            Arg::from_usage("-f, --from=[FROM] 'Set sender address'"),
-            Arg::from_usage("-t, --to=[TO] 'Set receiver address'"),
-            Arg::from_usage("-v, --verbose 'Verbose printing'"),
-            Arg::with_name("html").multiple(true)
-        ])
-        .get_matches()
+fn opts() -> Options {
+    let mut opts = Options::new();
+    {
+        opts.optopt("f", "from", "Set from address", "FROM");
+        opts.optopt("t", "to", "Set to address", "TO");
+        opts.optflag("v", "verbose", "Verbose printing");
+        opts.optflag("h", "help", "Print this help");
+    }
+    opts
 }
 
 fn conv(html: String, from: String, to: String) -> Result<(), Box<dyn Error>> {
@@ -25,29 +26,40 @@ fn main() {
         .filter_level(LevelFilter::Info)
         .init();
 
-    let args = args();
+    let opts = opts();
 
-    let mut from = args.value_of("from").unwrap_or_default();
-    if from.is_empty() {
-        from = "sender@example.com"
-    }
-    let mut to = args.value_of("to").unwrap_or_default();
-    if to.is_empty() {
-        to = "receiver@example.com"
-    }
-    let htms = args.values_of("html").unwrap_or(Default::default());
+    let input: Vec<String> = env::args().collect();
+    let args = match opts.parse(&input[1..]) {
+        Ok(m) => { m }
+        Err(..) => {
+            panic!("parse argument failed")
+        }
+    };
+    if args.opt_present("h") {
+        println!(r#"Command line for converting .html file to .eml file.
 
-    if htms.to_owned().count() == 0 {
-        error!("not html given");
+Usage:
+    html_to_email *.html{}
+Source:
+    https://github.com/gonejack/html_to_email
+"#, opts.usage(""));
+        return;
+    }
+    if args.free.is_empty() {
+        error!("no html file given");
         return;
     }
 
-    for htm in htms {
-        info!("process {}", htm);
+    let from = args.opt_str("from").unwrap_or("sender@exmail.com".to_string());
+    let to = args.opt_str("to").unwrap_or("receiver@example.com".to_string());
 
-        let res = conv(htm.to_string(), from.to_string(), to.to_string());
-        if res.is_err() {
-            error!("parse {} failed: {}", htm, res.err().unwrap());
+    for html in args.free {
+        info!("process {}", html);
+
+        let result = conv(html.clone(), from.clone(), to.clone());
+
+        if result.is_err() {
+            error!("parse {} failed: {}", html, result.err().unwrap());
         }
     }
 }
