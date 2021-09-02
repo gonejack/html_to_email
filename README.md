@@ -15,7 +15,6 @@ This command line converts .html file to .eml file.
 > html_to_email *.html
 ```
 ```
-html_to_email 
 https://github.com/gonejack/html_to_email
 
 USAGE:
