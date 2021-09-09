@@ -9,10 +9,11 @@ use html_to_email::cmd::HtmlToEmail;
 fn opts() -> Options {
     let mut opts = Options::new();
     {
-        opts.optopt("f", "from", "Set from address", "FROM");
-        opts.optopt("t", "to", "Set to address", "TO");
+        opts.optopt("f", "from", "Set sender address", "FROM");
+        opts.optopt("t", "to", "Set receiver address", "TO");
         opts.optflag("v", "verbose", "Verbose printing");
         opts.optflag("h", "help", "Print this help");
+        opts.optflag("", "about", "Show about");
     }
     opts
 }
@@ -35,14 +36,13 @@ fn main() {
             panic!("parse argument failed")
         }
     };
-    if args.opt_present("h") {
-        println!(r#"Command line for converting .html file to .eml file.
 
-Usage:
-    html_to_email *.html{}
-Source:
-    https://github.com/gonejack/html_to_email
-"#, opts.usage(""));
+    if args.opt_present("about") {
+        println!("{}", "Visit https://github.com/gonejack/html_to_email");
+        return
+    }
+    if args.opt_present("h") {
+        println!("{}", opts.usage("Usage: html_to_email *.html"));
         return;
     }
     if args.free.is_empty() {
