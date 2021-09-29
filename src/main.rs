@@ -1,7 +1,7 @@
 use std::env;
 use std::error::Error;
 
-use getopts::{Options};
+use getopts::Options;
 use log::{error, info, LevelFilter};
 
 use html_to_email::cmd::HtmlToEmail;
@@ -18,49 +18,44 @@ fn opts() -> Options {
     opts
 }
 
-fn conv(html: String, from: String, to: String) -> Result<(), Box<dyn Error>> {
-    HtmlToEmail::new(html, from, to).run()
-}
-
 fn main() {
     env_logger::builder()
         .filter_level(LevelFilter::Info)
         .init();
 
     let opts = opts();
-
     let input: Vec<String> = env::args().collect();
-    let args = match opts.parse(&input[1..]) {
-        Ok(m) => { m }
-        Err(..) => {
-            panic!("parse argument failed")
+    let args = opts.parse(&input[1..]).expect("parse argument failed");
+
+    match () {
+        _ if args.opt_present("about") => {
+            println!("{}", "Visit https://github.com/gonejack/html_to_email");
+            return;
         }
-    };
-
-    if args.opt_present("about") {
-        println!("{}", "Visit https://github.com/gonejack/html_to_email");
-        return
-    }
-    if args.opt_present("h") {
-        println!("{}", opts.usage("Usage: html_to_email *.html"));
-        return;
-    }
-    if args.free.is_empty() {
-        error!("no html file given");
-        return;
+        _ if args.opt_present("h") => {
+            println!("{}", opts.usage("Usage: html_to_email *.html"));
+            return;
+        }
+        _  if args.free.is_empty() => {
+            error!(target: "argument", "No .html files given");
+            return;
+        }
+        _ => {}
     }
 
-    let from = args.opt_str("from").unwrap_or("sender@exmail.com".to_string());
-    let to = args.opt_str("to").unwrap_or("receiver@example.com".to_string());
+    let from: String = args.opt_str("from").unwrap_or("sender@exmail.com".to_string());
+    let to: String = args.opt_str("to").unwrap_or("receiver@example.com".to_string());
 
     for html in args.free {
         info!("process {}", html);
 
-        let result = conv(html.clone(), from.clone(), to.clone());
-
-        if result.is_err() {
-            error!("parse {} failed: {}", html, result.err().unwrap());
+        let result = conv(&html, &from, &to);
+        if let Err(e) = result {
+            error!("parse {} failed: {}", html, e);
         }
     }
 }
 
+fn conv(html: &str, from: &str, to: &str) -> Result<(), Box<dyn Error>> {
+    HtmlToEmail::new(html, from, to).run()
+}

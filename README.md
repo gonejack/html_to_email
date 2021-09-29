@@ -6,19 +6,25 @@ This command line converts .html file to .eml file.
 [![GitHub license](https://img.shields.io/github/license/gonejack/html_to_email.svg?color=blue)](LICENSE)
 
 ### Install
+
 From crates.io
+
 ```shell
 > cargo install html_to_email
 ```
+
 Or the latest version
+
 ```shell
 > cargo install --git https://github.com/gonejack/html_to_email
 ```
 
 ### Usage
+
 ```shell
 > html_to_email *.html
 ```
+
 ```
 Options:
     -f, --from FROM     Set sender address

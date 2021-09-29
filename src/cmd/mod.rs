@@ -9,19 +9,15 @@ use log::warn;
 use visdom::types::Elements;
 use visdom::Vis;
 
-pub struct HtmlToEmail {
-    html: String,
-    from: String,
-    to: String,
+pub struct HtmlToEmail<'a> {
+    html: &'a str,
+    from: &'a str,
+    to: &'a str,
 }
 
-impl HtmlToEmail {
-    pub fn new(html: String, from: String, to: String) -> Self {
-        Self {
-            html,
-            from,
-            to,
-        }
+impl<'a> HtmlToEmail<'a> {
+    pub fn new(html: &'a str, from: &'a str, to: &'a str) -> Self {
+        Self { html, from, to }
     }
 
     pub fn run(&self) -> Result<(), Box<dyn Error>> {
@@ -32,23 +28,29 @@ impl HtmlToEmail {
             return Ok(());
         }
 
-        let data = fs::read_to_string(self.html.clone())?;
-        let doc = Vis::load(data.as_str())?;
+        let data = fs::read_to_string(self.html)?;
+        let doc = Vis::load(&data)?;
 
         self.clean_doc(&doc);
 
         let title = doc.find("title").text().to_string();
-        let body = SinglePartBuilder::new()
-            .header(ContentTransferEncoding::Base64)
-            .header(ContentType::TEXT_HTML)
-            .body(doc.html());
-        let email = Message::builder()
-            .from(self.from.parse()?)
-            .to(self.to.parse()?)
-            .subject(title)
-            .singlepart(body)?;
 
-        fs::write(output, email.formatted())?;
+        let mut pb = SinglePartBuilder::new();
+        {
+            pb = pb.header(ContentTransferEncoding::Base64);
+            pb = pb.header(ContentType::TEXT_HTML);
+        }
+        let part = pb.body(doc.html());
+
+        let mut mb = Message::builder();
+        {
+            mb = mb.from(self.from.parse()?);
+            mb = mb.to(self.to.parse()?);
+            mb = mb.subject(title);
+        }
+        let eml = mb.singlepart(part)?;
+
+        fs::write(output, eml.formatted())?;
 
         Ok(())
     }
