@@ -29,15 +29,19 @@ fn main() {
             println!("{}", opts.usage("Usage: html_to_email *.html"));
             return;
         }
-        _  if args.free.is_empty() => {
+        _ if args.free.is_empty() => {
             error!(target: "argument", "No .html files given");
             return;
         }
         _ => {}
     }
 
-    let from = args.opt_str("from").unwrap_or("sender@exmail.com".to_string());
-    let to = args.opt_str("to").unwrap_or("receiver@example.com".to_string());
+    let from = args
+        .opt_str("from")
+        .unwrap_or("sender@exmail.com".to_string());
+    let to = args
+        .opt_str("to")
+        .unwrap_or("receiver@example.com".to_string());
 
     for html in args.free {
         info!("process {}", html);
