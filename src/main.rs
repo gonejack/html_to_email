@@ -38,7 +38,7 @@ fn main() {
 
     let from = args
         .opt_str("from")
-        .unwrap_or("sender@exmail.com".to_string());
+        .unwrap_or("sender@example.com".to_string());
     let to = args
         .opt_str("to")
         .unwrap_or("receiver@example.com".to_string());
