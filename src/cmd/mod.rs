@@ -5,7 +5,7 @@ use std::path::Path;
 use lettre::Message;
 use lettre::message::header::{ContentTransferEncoding, ContentType};
 use lettre::message::SinglePartBuilder;
-use log::warn;
+use tracing::warn;
 use visdom::types::{BoxDynError, Elements};
 use visdom::Vis;
 

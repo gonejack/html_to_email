@@ -1,52 +1,53 @@
-use std::env;
-
-use getopts::Options;
-use log::{error, info, LevelFilter};
+use clap::Parser;
+use tracing::{error, info, Level};
 
 use html_to_email::cmd::HtmlToEmail;
 
+/// Convert .html files to .eml files
+#[derive(Parser)]
+#[command(name = "html_to_email", about = "This command line converts .html file to .eml file.")]
+struct Cli {
+    /// Set sender address
+    #[arg(short, long, default_value = "sender@example.com")]
+    from: String,
+
+    /// Set receiver address
+    #[arg(short, long, default_value = "receiver@example.com")]
+    to: String,
+
+    /// Verbose printing
+    #[arg(short, long)]
+    verbose: bool,
+
+    /// Show about
+    #[arg(long)]
+    about: bool,
+
+    /// HTML files to convert
+    #[arg(value_name = "FILE")]
+    files: Vec<String>,
+}
+
 fn main() {
-    env_logger::builder().filter_level(LevelFilter::Info).init();
+    let cli = Cli::parse();
 
-    let mut opts = Options::new();
-    {
-        opts.optopt("f", "from", "Set sender address", "FROM");
-        opts.optopt("t", "to", "Set receiver address", "TO");
-        opts.optflag("v", "verbose", "Verbose printing");
-        opts.optflag("h", "help", "Print this help");
-        opts.optflag("", "about", "Show about");
+    let level = if cli.verbose { Level::DEBUG } else { Level::INFO };
+    tracing_subscriber::fmt().with_max_level(level).init();
+
+    if cli.about {
+        println!("Visit https://github.com/gonejack/html_to_email");
+        return;
     }
 
-    let args_raw: Vec<String> = env::args().collect();
-    let args = opts.parse(&args_raw[1..]).expect("parse argument failed");
-
-    match () {
-        _ if args.opt_present("about") => {
-            println!("{}", "Visit https://github.com/gonejack/html_to_email");
-            return;
-        }
-        _ if args.opt_present("h") => {
-            println!("{}", opts.usage("Usage: html_to_email *.html"));
-            return;
-        }
-        _ if args.free.is_empty() => {
-            error!(target: "argument", "No .html files given");
-            return;
-        }
-        _ => {}
+    if cli.files.is_empty() {
+        error!(target: "argument", "No .html files given");
+        return;
     }
 
-    let from = args
-        .opt_str("from")
-        .unwrap_or("sender@example.com".to_string());
-    let to = args
-        .opt_str("to")
-        .unwrap_or("receiver@example.com".to_string());
-
-    for html in args.free {
+    for html in &cli.files {
         info!("process {}", html);
 
-        if let Err(e) = HtmlToEmail::new(&html, &from, &to).run() {
+        if let Err(e) = HtmlToEmail::new(html, &cli.from, &cli.to).run() {
             error!("parse {} failed: {}", html, e);
         }
     }

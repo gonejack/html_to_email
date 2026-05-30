@@ -2,3 +2,4 @@
 target
 *.eml
 *.html
+.DS_STORE
